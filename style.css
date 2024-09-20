@@ -54,7 +54,7 @@ body{
     justify-content: center;
     padding: 20px;
     background-color: rgb(236, 235, 235);
-    background-image: url(/images/img.jpg);
+    background-image: url(images/img.jpg);
     background-position: center;
 }
 
@@ -141,6 +141,14 @@ input {
   }
   #filtro-categoria{
     
+    background-color: #838282;
+    color: #fff;
+    margin: 20px;
+    padding: 10px;
+  }
+  #filtro-orden{
+    background-color: #838282;
+    color: #fff;
     margin: 20px;
     padding: 10px;
   }

@@ -2,6 +2,7 @@ const url = 'https://fakestoreapi.com/products'; // URL de la API
 const productContainer = document.querySelector(".carta-compra"); // Contenedor para las cartas de productos
 const cart = []; // Array para almacenar los productos en el carrito
 let allProducts = []; // Array para almacenar todos los productos obtenidos
+let currentProducts = []; // Array para almacenar los productos mostrados actualmente
 
 // Función para cargar categorías únicas en el filtro de categorías
 const loadCategories = (products) => {
@@ -15,21 +16,21 @@ const loadCategories = (products) => {
     categoryFilter.appendChild(option); // Agregar opciones al filtro
   });
 };
+
 // Evento para filtrar los productos cuando se selecciona una categoría
 const categoryFilter = document.getElementById('filtro-categoria');
 categoryFilter.addEventListener('change', (event) => {
   filterByCategory(event.target.value);
 });
 
-
 // Función para filtrar productos por categoría seleccionada
 const filterByCategory = (category) => {
   if (category === 'all') {
-    renderProducts(allProducts); // Si se selecciona "all", muestra todos los productos
+    currentProducts = allProducts; // Si se selecciona "all", muestra todos los productos
   } else {
-    const filteredProducts = allProducts.filter(product => product.category === category);
-    renderProducts(filteredProducts); // Muestra los productos filtrados por categoría
+    currentProducts = allProducts.filter(product => product.category === category); // Filtrar por categoría
   }
+  renderProducts(currentProducts); // Renderizar productos filtrados
 };
 
 // Función para renderizar los productos en la página
@@ -57,12 +58,13 @@ const getProducts = () => {
     .then(response => response.json())
     .then(products => {
       allProducts = products; // Almacenar los productos obtenidos
+      currentProducts = products; // Inicialmente todos los productos
       renderProducts(products); // Renderizar todos los productos inicialmente
       loadCategories(products); // Cargar las categorías en el filtro
     });
 };
 
-// Evento para filtrar los productos cuando se selecciona una categoría
+// Función para añadir productos al carrito
 const addToCart = (productId) => {
   const product = allProducts.find(prod => prod.id === productId); // Buscar el producto por su ID
   const productInCart = cart.find(item => item.id === productId); // Verificar si ya está en el carrito
@@ -78,7 +80,7 @@ const addToCart = (productId) => {
 
 // Función para renderizar el carrito
 const renderCart = () => {
-  const cartContainer = document.querySelector('.cart-items'); // Asegúrate de tener un contenedor para el carrito
+  const cartContainer = document.querySelector('.cart-items'); // Contenedor del carrito
   cartContainer.innerHTML = ''; // Limpiar los elementos del carrito
 
   cart.forEach(item => {
@@ -129,6 +131,26 @@ const removeFromCart = (productId) => {
     renderCart(); // Actualizar el carrito
   }
 };
+
+// Función para ordenar los productos
+const sortProducts = (order) => {
+  let sortedProducts = [...currentProducts]; // Copiar los productos actuales
+
+  if (order === 'asc') {
+    sortedProducts.sort((a, b) => a.price - b.price); // Orden ascendente por precio
+  } else if (order === 'desc') {
+    sortedProducts.sort((a, b) => b.price - a.price); // Orden descendente por precio
+  }
+
+  renderProducts(sortedProducts); // Volver a renderizar los productos ordenados
+};
+
+// Evento para ordenar los productos cuando se selecciona una opción de orden
+const sortSelect = document.getElementById('filtro-orden');
+sortSelect.addEventListener('change', (event) => {
+  sortProducts(event.target.value);
+});
+
 // Seleccionamos el botón del carrito y el contenedor del carrito
 const btnCart = document.querySelector('.carrito-compras');
 const containerCarrito = document.querySelector('.cart');
@@ -136,9 +158,9 @@ const containerCarrito = document.querySelector('.cart');
 // Mostrar/ocultar carrito al hacer clic en el botón del carrito
 btnCart.addEventListener('click', () => {
   containerCarrito.classList.toggle('contenido-carrito');
-  containerCarrito.classList.add('cart contenido-carrito-none');
+  containerCarrito.classList.add('cart', 'contenido-carrito-none');
 });
-
 
 // Llamar a la función para obtener y mostrar los productos al cargar la página
 getProducts();
+
